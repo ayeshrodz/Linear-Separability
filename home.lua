@@ -3,7 +3,23 @@ local relayout = require("relayout")
 
 local scene = composer.newScene()
 
-local _width, _height, _centerX, centerY = relayout._W, relayout._H, relayout._CX, relayout._CY
+local _width, _height, _centerX, _centerY = relayout._W, relayout._H, relayout._CX, relayout._CY
+local aspectRatio = _height / _width
+
+display.setDefault("background", 0.1,0.4,0.7)
+display.setDefault("fillColor", 0)
+
+
+local FONT = "Calibri"
+local HEADER = aspectRatio * 45
+
+local function layout()
+    
+    -- Display the title of the application.
+    heading = display.newText("Linear Separability", _centerX, _height - ((_centerY * 2) - 180), FONT, HEADER)
+
+end
+
 
 function scene:create( event )
  
@@ -19,8 +35,8 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        local bird = display.newRect(100, 200, 20, 20)
-        
+        layout()
+
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         

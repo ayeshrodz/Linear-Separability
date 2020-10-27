@@ -6,6 +6,8 @@
 
 -- Your code here
 local composer = require( "composer" )
+local relayout = require("relayout")
+
 local scene = composer.newScene()
 
 -- Calling the first scene.
@@ -15,4 +17,4 @@ local transition =
     time = 800
 }
 
-composer.gotoScene("home")
+composer.gotoScene("graph", transition)

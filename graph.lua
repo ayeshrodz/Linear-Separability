@@ -1,100 +1,160 @@
-local composer = require( "composer" )
+local composer = require("composer")
+local relayout = require("relayout")
+
 local scene = composer.newScene()
 
-local function DataReadFromCSV()
-    data = {}
-    local DPath = system.pathForFile( "data.csv" , system.ResourceDirectory)
-    local file,errorString = io.open(  DPath , "r")
-    print ("\n----Reading data in data.csv----")
+local _width, _height, _centerX, _centerY = relayout._W, relayout._H, relayout._CX, relayout._CY
+local aspectRatio = _height / _width
 
-    local i = 1
-    if not file then
-        print("File error!!!")
-    else 
-       local i = 1
-       for line in file:lines( ) do 
-            local _xValue,_yValue,_class = string.match(line,"(%d+),(%-?%d*%.?%d+),(%a+)")  
-            data[i] = {xValue=_xValue, yValue=_yValue, class=_class} 
-            print(data[i].xValue..","..data[i].yValue..","..data[i].class)
-            i = i + 1;
+display.setDefault("background", 0.1,0.4,0.7)
+display.setDefault("fillColor", 0)
+
+
+local FONT = "Arial"
+local HEADER = aspectRatio * 45
+local NORMAL = aspectRatio * 16
+local CSVFILE = "data.csv"
+local STROKE_WIDTH = 5
+
+--- **** Functions **** ---
+
+local function layout()
+    -- Display the title of the application.
+    heading = display.newText("Linear Separability", _centerX, _height - ((_centerY * 2) - 160), FONT, HEADER)
+end
+
+local function ReadDataFile()
+    data = {}
+    local counter = 1
+
+    local csvPath = system.pathForFile("data.csv", system.ResourceDirectory)
+    local file, readError = io.open(csvPath, "r")
+
+    if not file then  
+        print ("File opening error: " .. readError)
+    else    
+       for line in file:lines() do 
+            local _xValue, _yValue, _class = string.match(line,"(%d+),(%-?%d*%.?%d+),(%a+)")  
+            
+            data[counter] = {xValue=_xValue, yValue=_yValue, class=_class} 
+            print(data[counter].xValue..","..data[counter].yValue..","..data[counter].class)
+            counter = counter + 1;
        end
        io.close(file)
     end
     file = nil
 end
 
-local function labelDisplay()
-    label1 = display.newText("Linear Separability",display.contentCenterX,display.contentCenterY*0.20,"Arial",24)
-    label9 = display.newText("Benign = Dark Blue",display.contentCenterX*1.50,display.contentCenterY*0.72,"Arial",13)
-    label10 = display.newText("Malicious = Red",display.contentCenterX*1.50,display.contentCenterY*0.79,"Arial",13)
-    label11 = display.newText("ZeroDAy = Green",display.contentCenterX*1.50,display.contentCenterY*0.86  ,"Arial",13)
+local function displayLegend()
+    --label1 = display.newText("Linear Separability",display.contentCenterX,display.contentCenterY*0.20,"Arial",24)
+    pointA = display.newCircle(_centerX * 1.38, _centerY * 0.42, 16)
+    pointA:setFillColor(1, 0, 0.7)
+    label9 = display.newText("Benign", _centerX * 1.6, _centerY * 0.42, "Arial", NORMAL)
+    
+    pointB = display.newCircle(_centerX * 1.38, _centerY * 0.52, 16)
+    pointB:setFillColor(0.5, 1, 0)
+    label10 = display.newText("Malicious", _centerX * 1.65, _centerY * 0.52, "Arial", NORMAL)
+    
+    pointC = display.newCircle(_centerX * 1.38, _centerY * 0.62, 16)
+    pointC:setFillColor(0.7, 0.5, 0.2)
+    label11 = display.newText("ZeroDay", _centerX * 1.64, _centerY * 0.62, "Arial", NORMAL)
 end
 
 local function scatterGraph(data)
     -- graph layout
-    local graphSize = (math.min(display.contentHeight, display.contentWidth))*0.8
-    local graphLocation = {x = (display.contentWidth - graphSize)/2, y = (display.contentHeight - graphSize)/2}
+    local graphSize = (math.min(_width, _height)) * 0.85
+    local graphLocation = {x = (_width - graphSize) / 2, y = (_height - graphSize) / 2}
     graph = display.newGroup()
-    graph.x = display.contentCenterX*0.1
-    graph.y = display.contentCenterY*0.7
-    local axisThickness = 2
-    local graphThickness = 1
+    graph.x = _centerX * 0.2
+    graph.y = _centerY * 0.85
 
-    -- y axis
-    yAxis = display.newRect(0, 0, axisThickness, graphSize)
-    yAxis.anchorX = 0
-    yAxis.anchorY = 0
-    yAxis.type = "wall"
-    graph:insert(yAxis)
+    local yAxis = display.newLine(_centerX * 0.2, _centerY * 1.7, _centerX * 0.2, _centerY * 0.7)
+    yAxis.strokeWidth = STROKE_WIDTH
+    yAxis:setStrokeColor(0,0,0)
 
-    --x axis
-    xAxis = display.newRect(0, graphSize-axisThickness, graphSize, graphThickness)
-    xAxis.anchorX = 0
-    xAxis.anchorY = 0
-    xAxis.type = "wall"
-    graph:insert(xAxis)
+    local xAxis = display.newLine(_centerX * 0.2, _centerY * 1.7, _centerX * 1.9, _centerY * 1.7)
+    xAxis.strokeWidth = STROKE_WIDTH
+    xAxis:setStrokeColor(0,0,0)
 
     graphPoints = display.newGroup()
     pointA = display.newGroup(); graphPoints:insert(pointA)
     pointB = display.newGroup(); graphPoints:insert(pointB)
     for i=1, table.maxn(data) do
         if (data[i].class == "B") then
-            pointA1 = display.newCircle(pointA,(data[i].xValue)*25,(display.contentHeight - data[i].yValue*20)*0.90,4)
-            pointA1:setFillColor(0,0,1)
+            pointA1 = display.newCircle(pointA, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * 150) * 0.6, 10)
+            pointA1:setFillColor(1, 0, 0.7)
         else if (data[i].class == "M") then
-            pointB1 = display.newCircle(pointB,(data[i].xValue)*25,(display.contentHeight - data[i].yValue*20)*0.90,4)
-            pointB1:setFillColor(255, 0, 0)
-            else 
-                pointC1 = display.newCircle(pointB,(data[i].xValue)*25,(display.contentHeight - data[i].yValue*20)*0.90,4)
-                pointC1:setFillColor(0, 255, 0)
+            pointB1 = display.newCircle(pointB, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * 150) * 0.6, 10)
+            pointB1:setFillColor(0.5, 1, 0)
+        else 
+            pointC1 = display.newCircle(pointB, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * 150) * 0.6, 10)
+            pointC1:setFillColor(0.7, 0.5, 0.2)
         end
-        end 
+    end 
+end
+
+local function layout()
+    -- Display the title of the application.
+    heading = display.newText("Linear Separability", _centerX, _height - ((_centerY * 2) - 180), FONT, HEADER)
+end
+
+end
+
+
+
+
+
+function scene:create( event )
+ 
+    local sceneGroup = self.view
+    -- Code here runs when the scene is first created but has not yet appeared on screen
+ 
+end
+
+function scene:show( event )
+ 
+    local sceneGroup = self.view
+    local phase = event.phase
+ 
+    if ( phase == "will" ) then
+        -- Code here runs when the scene is still off screen (but is about to come on screen)
+        layout()
+        ReadDataFile()
+        displayLegend()
+        scatterGraph(data)
+
+    elseif ( phase == "did" ) then
+        -- Code here runs when the scene is entirely on screen
+        
     end
 end
 
-
-
-function scene:createScene( event )
+function scene:hide( event )
+ 
     local sceneGroup = self.view
+    local phase = event.phase
+ 
+    if ( phase == "will" ) then
+        -- Code here runs when the scene is on screen (but is about to go off screen)
+ 
+    elseif ( phase == "did" ) then
+        -- Code here runs immediately after the scene goes entirely off screen
+ 
+    end
 end
 
-function scene:enterScene( event )
-    DataReadFromCSV()
-    labelDisplay()
-    scatterGraph(data)
+function scene:destroy( event )
+ 
+    local sceneGroup = self.view
+    -- Code here runs prior to the removal of scene's view
+ 
 end
 
-function scene:exitScene( event )
-
-end
-
-function scene:destroyScene( event )
-
-end
-
-scene:addEventListener( "createScene", scene )
-scene:addEventListener( "enterScene", scene )
-scene:addEventListener( "exitScene", scene )
-scene:addEventListener( "destroyScene", scene )
+scene:addEventListener( "create", scene )
+scene:addEventListener( "show", scene )
+scene:addEventListener( "hide", scene )
+scene:addEventListener( "destroy", scene )
 
 return scene
+
+
