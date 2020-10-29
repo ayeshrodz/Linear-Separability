@@ -6,21 +6,22 @@ local scene = composer.newScene()
 local _width, _height, _centerX, _centerY = relayout._W, relayout._H, relayout._CX, relayout._CY
 local aspectRatio = _height / _width
 
-display.setDefault("background", 0.1,0.4,0.7)
+display.setDefault("background", 0.1, 0.4, 0.6)
 display.setDefault("fillColor", 0)
-
+a = require 'affine'
 
 local FONT = "Arial"
 local HEADER = aspectRatio * 45
 local NORMAL = aspectRatio * 16
 local CSVFILE = "data.csv"
 local STROKE_WIDTH = 5
+local transformation = "original"
 
 --- **** Functions **** ---
 
 local function layout()
     -- Display the title of the application.
-    heading = display.newText("Linear Separability", _centerX, _height - ((_centerY * 2) - 160), FONT, HEADER)
+    --heading = display.newText("Linear Separability", _centerX, _height - ((_centerY * 2) - 160), FONT, HEADER)
 end
 
 local function ReadDataFile()
@@ -43,6 +44,34 @@ local function ReadDataFile()
        io.close(file)
     end
     file = nil
+end
+
+local function apply_transformation(data)
+    if (rawequal(next(data), nil)) then
+        print ("fail")
+    else
+        if (transformation == "original") then
+            T1 = a.trans(10,10)
+            T2 = a.scale(-2,-2)
+            T3 = T1 * T2
+
+            x2,y2 = T3(10,10)
+
+            print(x2,y2) --> 0 0
+
+            T3 = T2 * T1
+
+            x2,y2 = T3(10,10)
+            print(x2,y2) -->
+
+
+            for i=1, data.xValue do
+                print(data.xValue[i])
+                i = i + 1
+            end
+
+        end
+    end
 end
 
 local function displayLegend()
@@ -79,19 +108,37 @@ local function scatterGraph(data)
     graphPoints = display.newGroup()
     pointA = display.newGroup(); graphPoints:insert(pointA)
     pointB = display.newGroup(); graphPoints:insert(pointB)
+
+
     for i=1, table.maxn(data) do
         if (data[i].class == "B") then
-            pointA1 = display.newCircle(pointA, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * 150) * 0.6, 10)
-            pointA1:setFillColor(1, 0, 0.7)
+            if (transformation == "original") then
+                pointA1 = display.newCircle(pointA, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * 150) * 0.6, 10)
+                pointA1:setFillColor(1, 0, 0.7)
+            else
+                pointA1 = display.newCircle(pointA, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue  * -150) * 0.6, 10)
+                pointA1:setFillColor(1, 0, 0.7)
+            end
         else if (data[i].class == "M") then
-            pointB1 = display.newCircle(pointB, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * 150) * 0.6, 10)
-            pointB1:setFillColor(0.5, 1, 0)
+            if (transformation == "original") then
+                pointB1 = display.newCircle(pointB, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * 150) * 0.6, 10)
+                pointB1:setFillColor(0.5, 1, 0)
+            else
+                pointB1 = display.newCircle(pointB, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * -150) * 0.6, 10)
+                pointB1:setFillColor(0.5, 1, 0)
+            end
         else 
-            pointC1 = display.newCircle(pointB, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * 150) * 0.6, 10)
-            pointC1:setFillColor(0.7, 0.5, 0.2)
+            if (transformation == "original") then
+                pointC1 = display.newCircle(pointB, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * 150) * 0.6, 10)
+                pointC1:setFillColor(0.7, 0.5, 0.2)
+            else
+                pointC1 = display.newCircle(pointB, (data[i].xValue + 1) * 60, (display.contentHeight - data[i].yValue * -150) * 0.6, 10)
+                pointC1:setFillColor(0.7, 0.5, 0.2)
+            end
         end
-    end 
+    end    
 end
+
 
 local function layout()
     -- Display the title of the application.
@@ -99,9 +146,6 @@ local function layout()
 end
 
 end
-
-
-
 
 
 function scene:create( event )
@@ -120,8 +164,10 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         layout()
         ReadDataFile()
+        apply_transformation(data)
         displayLegend()
         scatterGraph(data)
+        --original_data_display(data)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen

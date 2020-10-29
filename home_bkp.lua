@@ -1,6 +1,5 @@
 local composer = require("composer")
 local relayout = require("relayout")
-local widget = require("widget")
 
 local scene = composer.newScene()
 
@@ -23,40 +22,6 @@ local function layout()
 end
 
 
-local function handleButtonEvent( event )
-    if ( event.phase == "ended" or event.phase == "submitted") then
-        -- Creating an error message for not entering the X coordinate.
-            composer.gotoScene("graph")      
-    end  
-end
-
-
--- Creating a submit button.
-local function createButtons()
-Submit = widget.newButton(
-    {
-        label = "Submit",
-        emboss = true,
-        -- Properties for a rounded rectangle button
-        shape = "roundedRect",
-        width = _width - _centerX,
-        height = aspectRatio * 40,
-        cornerRadius = 2,
-        fillColor = { default={0.6,0.6,1}, over={0,0,0,0} },
-        strokeColor = { default={0,0,0.1,0.8}, over={0.8,0.8,1,1} },
-        strokeWidth = 4,
-        labelColor = {default={0,0,0,1}},
-        font = FONT,
-        fontSize = NORMAL
-
-    }
-)
-     
--- Center the button
-Submit.x = _centerX
-Submit.y = _height - (aspectRatio * 100)
-end
-
 function scene:create( event )
  
     local sceneGroup = self.view
@@ -71,10 +36,7 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        createButtons()
         layout()
-
-        Submit:addEventListener("touch",handleButtonEvent)
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -92,7 +54,7 @@ function scene:hide( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
-        Submit:removeSelf()
+ 
     end
 end
 

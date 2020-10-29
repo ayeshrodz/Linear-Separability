@@ -17,4 +17,4 @@ local transition =
     time = 800
 }
 
-composer.gotoScene("graph", transition)
+composer.gotoScene("home", transition)

@@ -1,5 +1,5 @@
-local aspectRatio = display.pixelHeight / display.pixelWigth
-local width = display.pixelWigth
+local aspectRatio = display.pixelHeight / display.pixelWidth
+local width = display.pixelWidth
 local height = width * aspectRatio
 
 application = {
