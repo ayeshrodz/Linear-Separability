@@ -6,7 +6,6 @@
 
 -- Your code here
 local composer = require( "composer" )
-local relayout = require("relayout")
 
 local scene = composer.newScene()
 
@@ -14,7 +13,7 @@ local scene = composer.newScene()
 local transition =
 {
     effect = "slideLeft",
-    time = 800
+    time = 2000
 }
 
 composer.gotoScene("home", transition)

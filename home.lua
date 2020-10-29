@@ -1,25 +1,31 @@
 local composer = require("composer")
-local relayout = require("relayout")
+--local relayout = require("relayout")
 local widget = require("widget")
+local math = require("math")
 
 local scene = composer.newScene()
 
-local _width, _height, _centerX, _centerY = relayout._W, relayout._H, relayout._CX, relayout._CY
-local aspectRatio = _height / _width
+--local _width, _height, _centerX, _centerY = relayout._W, relayout._H, relayout._CX, relayout._CY
+local _width, _height, _centerX, _centerY = display.contentWidth, display.contentHeight, display.contentCenterX, display.contentCenterY
+
+local screenHypotenuse = math.sqrt(math.pow(_height,2) + math.pow(_width,2))
 
 display.setDefault("background", 0.1, 0.4, 0.6)
 display.setDefault("fillColor", 0)
 
+local transition =
+{
+    effect = "slideLeft",
+    time = 2000
+}
 
 local FONT = "Arial"
-local HEADER = aspectRatio * 45
-local NORMAL = aspectRatio * 16
+local HEADER = screenHypotenuse / 23
+local NORMAL = screenHypotenuse / 45
 
 local function layout()
-    
     -- Display the title of the application.
-    heading = display.newText("Linear Separability", _centerX, _height - ((_centerY * 2) - 180), FONT, HEADER)
-
+    heading = display.newText("Linear Separability", _centerX, (_height / 8), FONT, HEADER)
 end
 
 
@@ -40,11 +46,11 @@ Submit = widget.newButton(
         -- Properties for a rounded rectangle button
         shape = "roundedRect",
         width = _width - _centerX,
-        height = aspectRatio * 40,
+        height = screenHypotenuse / 20,
         cornerRadius = 2,
         fillColor = { default={0.6,0.6,1}, over={0,0,0,0} },
         strokeColor = { default={0,0,0.1,0.8}, over={0.8,0.8,1,1} },
-        strokeWidth = 4,
+        strokeWidth = 2,
         labelColor = {default={0,0,0,1}},
         font = FONT,
         fontSize = NORMAL
@@ -54,7 +60,7 @@ Submit = widget.newButton(
      
 -- Center the button
 Submit.x = _centerX
-Submit.y = _height - (aspectRatio * 100)
+Submit.y = _centerY * 1.8
 end
 
 function scene:create( event )
