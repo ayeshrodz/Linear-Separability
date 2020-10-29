@@ -7,7 +7,6 @@ local scene = composer.newScene()
 local _width, _height, _centerX, _centerY = display.contentWidth, display.contentHeight, display.contentCenterX, display.contentCenterY
 
 local screenHypotenuse = math.sqrt(math.pow(_height,2) + math.pow(_width,2))
-local aspectRatio = _height / _width
 
 display.setDefault("background", 0.1, 0.4, 0.6)
 display.setDefault("fillColor", 0)
@@ -18,7 +17,8 @@ local HEADER = screenHypotenuse / 23
 local NORMAL = screenHypotenuse / 45
 local CSVFILE = "data.csv"
 local STROKE_WIDTH = 4
-local transform = "Shearing"
+
+local transform = " "
 local inverse = "yes"
 local input = 1
 
@@ -49,6 +49,16 @@ local function ReadDataFile()
        io.close(file)
     end
     file = nil
+end
+
+if (switch.id == 'Translation') then
+    transform = "Translation"
+elseif (switch.id =='Scaling') then
+    transform = "Scaling"
+elseif (switch.id =='Rotation') then
+    transform = "Rotation"
+elseif (switch.id =='Shearing') then
+    transform = "Shearing"
 end
 
 local function apply_transformation(data, transformation, input)
