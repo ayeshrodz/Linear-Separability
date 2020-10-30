@@ -1,6 +1,7 @@
 local composer = require("composer")
 --local relayout = require("relayout")
 local math = require("math")
+local widget = require("widget")
 local scene = composer.newScene()
 
 --local _width, _height, _centerX, _centerY = relayout._W, relayout._H, relayout._CX, relayout._CY
@@ -8,7 +9,7 @@ local _width, _height, _centerX, _centerY = display.contentWidth, display.conten
 
 local screenHypotenuse = math.sqrt(math.pow(_height,2) + math.pow(_width,2))
 
-display.setDefault("background", 0.1, 0.4, 0.6)
+display.setDefault("background", 0.1, 0.7, 0.8)
 display.setDefault("fillColor", 0)
 a = require 'affine'
 
@@ -28,6 +29,37 @@ local function layout()
     -- Display the title of the application.
     --heading = display.newText("Linear Separability", _centerX, _height - ((_centerY * 2) - 160), FONT, HEADER)
 end
+
+local function handleButtonEvent( event )
+    if ( event.phase == "ended" or event.phase == "submitted") then
+        os.exit()   
+    end  
+end
+
+local function createButtons()
+    Exit = widget.newButton(
+        {
+            label = "Exit",
+            emboss = true,
+            -- Properties for a rounded rectangle button
+            shape = "roundedRect",
+            width = _width - _centerX * 1.5,
+            height = screenHypotenuse / 20,
+            cornerRadius = 20,
+            fillColor = { default={0.6,0.6,1}, over={0,0,0,0} },
+            strokeColor = { default={0,0,0.1,0.8}, over={0.8,0.8,1,1} },
+            strokeWidth = 2,
+            labelColor = {default={0,0,0,1}},
+            font = FONT,
+            fontSize = NORMAL
+    
+        }
+    )
+
+    Exit.x = _width * 0.2
+    Exit.y = _height * 0.23
+end
+
 
 local function ReadDataFile()
     data = {}
@@ -222,7 +254,7 @@ end
 
 local function layout()
     -- Display the title of the application.
-    heading = display.newText("Linear Separability", _centerX, _height - ((_centerY * 2) - 180), FONT, HEADER)
+    --heading = display.newText("Linear Separability", _centerX, _height - ((_centerY * 2) - 180), FONT, HEADER)
 end
 
 end
@@ -242,11 +274,14 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
+        print("Graph is in scene")
         layout()
+        createButtons()
         ReadDataFile()
         apply_transformation(data, transform, input)
         displayLegend()
         scatterGraph(data)
+        Exit:addEventListener("touch",handleButtonEvent)
         --original_data_display(data)
 
     elseif ( phase == "did" ) then
