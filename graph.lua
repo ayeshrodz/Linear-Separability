@@ -9,7 +9,7 @@ local _width, _height, _centerX, _centerY = display.contentWidth, display.conten
 
 local screenHypotenuse = math.sqrt(math.pow(_height,2) + math.pow(_width,2))
 
-display.setDefault("background", 0.1, 0.7, 0.8)
+--display.setDefault("background", 0.1, 0.7, 0.8)
 display.setDefault("fillColor", 0)
 a = require 'affine'
 affine = require 'affine'
@@ -18,7 +18,7 @@ local FONT = "Arial"
 local HEADER = screenHypotenuse / 23
 local NORMAL = screenHypotenuse / 45
 local CSVFILE = "data.csv"
-local STROKE_WIDTH = 4
+local STROKE_WIDTH = 3
 
 local transform = " "
 local inverse = false

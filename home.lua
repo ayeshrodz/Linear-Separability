@@ -10,8 +10,17 @@ local _width, _height, _centerX, _centerY = display.contentWidth, display.conten
 
 local screenHypotenuse = math.sqrt(math.pow(_height,2) + math.pow(_width,2))
 
-display.setDefault("background", 0.1, 0.7, 0.8)
+--display.setDefault("background", 0.1, 0.7, 0.8)
 display.setDefault("fillColor", 0)
+
+display.setDefault( "textureWrapX", "repeat" )
+display.setDefault( "textureWrapY", "repeat" )
+     
+local x,y = _centerX, _centerY
+local o = display.newRect( x, y, _width, _height)
+o.fill = { type="image", filename="background.png" }
+
+
 
 local FONT = "Arial"
 local HEADER = screenHypotenuse / 23
