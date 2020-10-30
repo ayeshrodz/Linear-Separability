@@ -12,6 +12,7 @@ local screenHypotenuse = math.sqrt(math.pow(_height,2) + math.pow(_width,2))
 display.setDefault("background", 0.1, 0.7, 0.8)
 display.setDefault("fillColor", 0)
 a = require 'affine'
+affine = require 'affine'
 
 local FONT = "Arial"
 local HEADER = screenHypotenuse / 23
@@ -20,8 +21,8 @@ local CSVFILE = "data.csv"
 local STROKE_WIDTH = 4
 
 local transform = " "
-local inverse = "yes"
-local input = 1
+local inverse = false
+local input = -1
 
 --- **** Functions **** ---
 
@@ -93,56 +94,66 @@ elseif (switch.id =='Shearing') then
     transform = "Shearing"
 end
 
+local function transformData (data, input, inverse)
+    --Transformation function's algorithm inside affine library
+    --x2 = x + dx
+    --y2 = y + dy
+
+    if (inverse == false) then
+        T1 = affine.trans(0,input)
+
+        _x1, _y1 = T1(data.xValue,data.yValue)
+        return {x=_x1, y=_y1}
+    else
+        T1_ = a.trans(0,input)
+        _1T = a.inverse(T1_)
+
+        _x2,_y2 = _1T(data.xValue,data.yValue)
+        return {x=_x2, y=_y2}
+    end
+end
+
+local function scaleData (data, input, inverse)
+    --Scale function's algorithm inside affine library
+    --x2 = x * sx
+    --y2 = y * sy
+
+    if (inverse == false) then
+        T2 = a.scale(1,1 + (input / 2))
+
+        _x1, _y1 = T2(data.xValue,data.yValue)
+        return {x=_x1, y=_y1}
+    else
+        T2_ = a.scale(1,1 + (input / 2))
+        _2T = a.inverse(T2_)
+
+        _x2, _y2 = T2(data.xValue,data.yValue)
+        return {x=_x2, y=_y2}
+    end
+end
+
+
 local function apply_transformation(data, transformation, input)
     if (rawequal(next(data), nil)) then
         print ("fail")
     else
         if (transformation == "Translation") then
-            if (inverse == "no") then
-                for pos,val in pairs( data ) do
-                    T1 = a.trans(0,input)
-                    --x2 = x + dx
-                    --y2 = y + dy
-                    x1,y1 = T1(val.xValue,val.yValue)
-                    val.xValue = x1
-                    val.yValue = y1
-                end 
-            else
-                for pos,val in pairs( data ) do
-                    T1_ = a.trans(0,input)
-                    _1T = a.inverse(T1_)
-                    --x2 = x + dx
-                    --y2 = y + dy
-                    x1,y1 = _1T(val.xValue,val.yValue)
-                    val.xValue = x1
-                    val.yValue = y1
-                end 
+            for pos,val in pairs( data ) do
+                trnData = transformData(val, input, inverse)
+                val.xValue = trnData.x
+                val.yValue = trnData.y
             end
             
         elseif (transformation == "Scaling") then  
-            if (inverse == "no") then
-                for pos,val in pairs( data ) do
-                    T2 = a.scale(1,1 + (input / 2))
-                    --x2 = x * sx
-                    --y2 = y * sy
-                    x2,y2 = T2(val.xValue,val.yValue)
-                    val.xValue = x2
-                    val.yValue = y2
-                end 
-            else
-                for pos,val in pairs( data ) do
-                    T2_ = a.scale(1,1 + (input / 2))
-                    _2T = a.inverse(T2_)
-                    --x2 = x * sx
-                    --y2 = y * sy
-                    x2,y2 = _2T(val.xValue,val.yValue)
-                    val.xValue = x2
-                    val.yValue = y2
-                end 
-            end
+            for pos,val in pairs( data ) do
+                sclData = scaleData(val, input, inverse)
+                val.xValue = sclData.x
+                val.yValue = sclData.y
+            end 
+
               
         elseif (transformation == "Rotation") then  
-            if (inverse == "no") then
+            if (inverse == false) then
                 for pos,val in pairs( data ) do
                     T3 = a.rotate(input / 6)
                     --x2 = x*math.cos(theta) - y*math.sin(theta)
@@ -164,7 +175,7 @@ local function apply_transformation(data, transformation, input)
             end
             
         elseif (transformation == "Shearing") then
-            if (inverse == "no") then
+            if (inverse == false) then
                 for pos,val in pairs( data ) do
                     T4 = a.shear(input / 4, input / 4)
                     --x2 = x + kx*y

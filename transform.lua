@@ -23,7 +23,7 @@ local FONT = "Arial"
 local HEADER = screenHypotenuse / 23
 local NORMAL = screenHypotenuse / 35
 
-local function layout()
+local function showMenu()
     -- Display the title of the application.
     --heading = display.newText("Linear Separability", _centerX, (_height / 8), FONT, HEADER)
     menu = display.newText("Please select the transform function", _centerX, (_height / 4.2), FONT, NORMAL * 0.9)
@@ -87,8 +87,9 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
+        
+        showMenu()
         createButtons()
-        layout()
         switch=""
         Submit:addEventListener("touch",handleButtonEvent)
 
@@ -177,12 +178,13 @@ function scene:hide( event )
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
         Submit:removeSelf()
-        radioGroup:removeSelf()
+        
         menu:removeSelf()
         Tr:removeSelf()
         Sc:removeSelf()
         Ro:removeSelf()
         Sh:removeSelf()
+        radioGroup:removeSelf()
     end
 end
 

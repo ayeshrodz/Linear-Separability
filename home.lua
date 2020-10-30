@@ -20,10 +20,14 @@ local NORMAL = screenHypotenuse / 35
 local function layout()
     -- Display the title of the application.
     heading = display.newText("Linear Separability", _centerX, (_height / 8), FONT, HEADER)
+end
+
+local function showImage()
     image = display.newImageRect( "Transform.png", _centerX*1.5, _centerX *1.5)
     image.x = _centerX
     image.y = _centerY * 0.9
 end
+
 
 local function handleButtonEvent( event )
     if ( event.phase == "ended" or event.phase == "submitted") then
@@ -79,8 +83,10 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        createButtons()
+       
         layout()
+        createButtons()
+        showImage()
         getFileName()
 
         Start:addEventListener("touch",handleButtonEvent)
@@ -101,8 +107,8 @@ function scene:hide( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
-        image:removeSelf()
         Start:removeSelf()
+        image:removeSelf()
         file:removeSelf()
         fileField:removeSelf()
 
@@ -113,7 +119,6 @@ function scene:destroy( event )
  
     local sceneGroup = self.view
     -- Code here runs prior to the removal of scene's view
- 
 end
 
 scene:addEventListener( "create", scene )
