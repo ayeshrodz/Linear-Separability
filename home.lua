@@ -13,9 +13,7 @@ local screenHypotenuse = math.sqrt(math.pow(_height,2) + math.pow(_width,2))
 --display.setDefault("background", 0.1, 0.7, 0.8)
 display.setDefault("fillColor", 0)
 
-display.setDefault( "textureWrapX", "repeat" )
-display.setDefault( "textureWrapY", "repeat" )
-     
+   
 local x,y = _centerX, _centerY
 local o = display.newRect( x, y, _width, _height)
 o.fill = { type="image", filename="background.png" }
@@ -28,13 +26,14 @@ local NORMAL = screenHypotenuse / 35
 
 local function layout()
     -- Display the title of the application.
-    heading = display.newText("Linear Separability", _centerX, (_height / 8), FONT, HEADER)
+    heading = display.newText("Data Separability", _centerX, (_height / 8), FONT, HEADER)
+    subtitle = display.newText("{ Using Machine Learning Algorithms }", _centerX, (_height / 5), FONT, NORMAL * 0.9)
 end
 
 local function showImage()
     image = display.newImageRect( "Transform.png", _centerX*1.5, _centerX *1.5)
     image.x = _centerX
-    image.y = _centerY * 0.9
+    image.y = _centerY * 0.95
 end
 
 
@@ -92,7 +91,6 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-       
         layout()
         createButtons()
         showImage()
@@ -116,11 +114,36 @@ function scene:hide( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
-        Start:removeSelf()
-        image:removeSelf()
-        file:removeSelf()
-        fileField:removeSelf()
-
+        if Start ~= nil then 
+            Start:removeSelf() 
+            Start = nil
+        end
+        --Start:removeSelf()
+        if image ~= nil then 
+            image:removeSelf() 
+            image = nil
+        end 
+        --image:removeSelf()
+        if file ~= nil then 
+            file:removeSelf() 
+            file = nil
+        end
+        --file:removeSelf()
+        if fileField ~= nil then 
+            fileField:removeSelf() 
+            fileField = nil
+        end 
+        --fileField:removeSelf()
+        if subtitle ~= nil then 
+            subtitle:removeSelf() 
+            subtitle = nil
+        end 
+        --subtitle: removeSelf()
+        if heading ~= nil then 
+            heading:removeSelf() 
+            heading = nil
+        end
+        --heading: removeSelf()
     end
 end
 
@@ -128,6 +151,7 @@ function scene:destroy( event )
  
     local sceneGroup = self.view
     -- Code here runs prior to the removal of scene's view
+
 end
 
 scene:addEventListener( "create", scene )

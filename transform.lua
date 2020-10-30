@@ -23,18 +23,39 @@ local FONT = "Arial"
 local HEADER = screenHypotenuse / 23
 local NORMAL = screenHypotenuse / 35
 
-local function showMenu()
+local function layout()
     -- Display the title of the application.
-    --heading = display.newText("Linear Separability", _centerX, (_height / 8), FONT, HEADER)
-    menu = display.newText("Please select the transform function", _centerX, (_height / 4.2), FONT, NORMAL * 0.9)
+    heading2 = display.newText("Linear Separability", _centerX, (_height / 8), FONT, HEADER)
+    menu1 = display.newText("● Please select a transform function", _centerX, (_height / 3.8), FONT, NORMAL)
+    imgSeperator = display.newImageRect( "seperator.png", _width, _centerX * 0.9)
+    imgSeperator.x = _centerX
+    imgSeperator.y = _centerY * 0.4
+    menu2 = display.newText("● Please enter options", _centerX / 1.55, _centerY + (_height / 5), FONT, NORMAL)
+
+    range = display.newText("Range :", _width * 0.2 , _height * 0.78, FONT, NORMAL * 0.9)
+    rangeField = native.newTextField(_width * 0.4, _height * 0.78, _centerX/3, _centerX/5.5)
+    rangeField.font = native.newFont(FONT, NORMAL * 0.9)
+    rangeField.placeholder = "Integer / Float"
+    rangeField.text = "0"
+
+    inverseText = display.newText("Inverse :", _width * 0.66 , _height * 0.782, FONT, NORMAL * 0.9)
 end
 
+local function includeOptions()
+end
 
 local function handleButtonEvent( event )
     if ( event.phase == "ended" or event.phase == "submitted") then
         -- Creating an error message for not entering the X coordinate.
         if (switch =="" or switch == null) then
             local xAlert = native.showAlert("Alert", "Please enter the transform function",{"OK"})
+        elseif (userInputRange == "" or userInputRange == null) then
+            local yAlert = native.showAlert("Alert", "Please enter Range",{"OK"})
+        elseif (tonumber(userInputRange) > 1) then 
+            local yRangeAlert = native.showAlert("Alert", "Please enter a value between 1 and -1",{"OK"})
+        elseif (tonumber(userInputRange) < -1) then 
+            local yRangeAlert = native.showAlert("Alert", "Please enter a value between 1 and -1",{"OK"})
+        
         else
             --os.exit()
             composer.gotoScene("graph") 
@@ -44,6 +65,20 @@ end
 
 local function onSwitchPress( event )
     switch = event.target
+end
+
+local function onSwitch2Press( event )
+    switch2 = event.target
+    print( "Switch with ID '"..switch2.id.."' is on: "..tostring(switch2.isOn) )
+end
+
+-- Getting user input for the range.
+local function rangeValue(event)
+    if (event.phase == "ended" or event.phase == "editing") then
+        userInputRange = event.target.text
+        
+        print("Input Range: " ..userInputRange)  
+    end
 end
 
 -- Creating a submit button.
@@ -84,16 +119,23 @@ function scene:show( event )
  
     local sceneGroup = self.view
     local phase = event.phase
+    local params = event.params
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         
-        showMenu()
+        layout()
         createButtons()
         switch=""
-        Submit:addEventListener("touch",handleButtonEvent)
+        switch2=""
+        userInputRange=""
 
-                
+        rangeField:addEventListener("userInput", rangeValue)
+        rangeField.inputType = "decimal"
+        Submit:addEventListener("touch",handleButtonEvent)
+        
+        
+        print(userInputRange)
         -- Creating a new group for the four distance calculation  methods.
         radioGroup = display.newGroup()
 
@@ -156,10 +198,37 @@ function scene:show( event )
         )
         radioGroup:insert( Shearing )
         Sh = display.newText("Shearing", _centerX * 1.04, _centerY / 0.89, FONT, NORMAL)
+        
+        -- Creating a radio button for shearing method.
+        local Default = widget.newSwitch(
+            {
+                left = _centerX * 0.55,
+                top = _centerY / 0.82,
+                style = "radio",
+                width = screenHypotenuse / 25,
+                height = screenHypotenuse / 25,
+                id = "Default",
+                onPress = onSwitchPress
+            }
+        )
+        radioGroup:insert( Default )
+        Df = display.newText("Default", _centerX * 1, _centerY / 0.79, FONT, NORMAL)
         radioGroup.fillColor = {1,1,1}
 
         -- Adding event listener for the radio buttons.
         radioGroup:addEventListener("touch",onSwitchPress)  
+
+        checkboxButton = widget.newSwitch(
+        {
+            left = _centerX * 1.6,
+            top = _height * 0.76,
+            width = screenHypotenuse / 25,
+            height = screenHypotenuse / 25,
+            style = "checkbox",
+            id = "Inverse",
+            onPress = onSwitch2Press
+        })
+
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -178,13 +247,23 @@ function scene:hide( event )
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
         Submit:removeSelf()
-        
-        menu:removeSelf()
+        imgSeperator:removeSelf()
+        menu1:removeSelf()
+        menu2:removeSelf()
         Tr:removeSelf()
         Sc:removeSelf()
         Ro:removeSelf()
         Sh:removeSelf()
+        Df:removeSelf()
         radioGroup:removeSelf()
+        range:removeSelf()
+        rangeField:removeSelf()
+        inverseText:removeSelf()
+        if checkboxButton ~= nil then 
+            checkboxButton:removeSelf() 
+            checkboxButton = nil
+        end
+        --checkboxButton:removeSelf()
     end
 end
 
@@ -192,7 +271,6 @@ function scene:destroy( event )
  
     local sceneGroup = self.view
     -- Code here runs prior to the removal of scene's view
- 
 end
 
 scene:addEventListener( "create", scene )
